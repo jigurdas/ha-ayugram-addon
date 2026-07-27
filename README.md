@@ -34,7 +34,7 @@ The addon is built on top of `kasmweb/telegram` (a KasmVNC-based Docker image th
 
 Push these files to a GitHub repository, for example:
 ```
-https://github.com/YOUR_USERNAME/ha-ayugram-addon
+https://github.com/jigurdas/ha-ayugram-addon
 ```
 
 ### Step 2: Add the repository in Home Assistant
