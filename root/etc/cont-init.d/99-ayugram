@@ -1,0 +1,14 @@
+#!/bin/bash
+# 99-ayugram
+
+# Add AyuGram to the desktop menu
+cat <<EOF > /usr/share/applications/ayugram.desktop
+[Desktop Entry]
+Name=AyuGram
+Exec=/opt/AyuGram/AyuGram
+Icon=/opt/AyuGram/share/icons/hicolor/512x512/apps/ayugram.png
+Type=Application
+Categories=Network;InstantMessaging;
+EOF
+
+chmod +x /usr/share/applications/ayugram.desktop
