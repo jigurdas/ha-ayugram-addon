@@ -28,11 +28,8 @@ RUN chmod +x /usr/local/bin/start.sh
 COPY init.sh /etc/cont-init.d/99-ayugram-init
 RUN chmod +x /etc/cont-init.d/99-ayugram-init
 
-# Use the base image's entrypoint but ensure our scripts are ready
-# The base image uses a specific startup process, we'll hook into it
 COPY root /
 RUN chmod +x /etc/cont-init.d/99-ayugram
 
-# Keep the original CMD or entrypoint if needed, but usually HA handles this
-# For KasmVNC based images, we might need to stay close to their structure
+CMD ["bash", "/usr/local/bin/start.sh"]
 
