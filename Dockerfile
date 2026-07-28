@@ -11,11 +11,13 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
 # Note: We download the official Ayugram release for Linux
 USER root
 
-RUN apt-get update && apt-get install -y wget tar xz-utils \
-    && wget -O /tmp/ayugram.tar.xz https://github.com/AyuGram/AyuGramDesktop/releases/latest/download/AyuGram-Setup.tar.xz \
+RUN apt-get update && apt-get install -y wget tar xz-utils curl jq \
+    && AYUGRAM_URL=$(curl -s https://api.github.com/repos/AyuGram/AyuGramDesktop/releases/latest | grep "browser_download_url" | grep -i "\.tar\.xz" | head -n 1 | cut -d '"' -f 4) \
+    && wget -O /tmp/ayugram.tar.xz "$AYUGRAM_URL" \
     && tar -xf /tmp/ayugram.tar.xz -C /opt/ \
     && rm -f /tmp/ayugram.tar.xz \
-    && apt-get clean
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Create a launcher script
 RUN echo '#!/bin/bash' > /usr/local/bin/launch-ayugram.sh \
