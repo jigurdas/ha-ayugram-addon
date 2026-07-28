@@ -1,5 +1,12 @@
 FROM kasmweb/telegram:1.18.0
 
+# Set environment variables for Home Assistant
+ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
+    S6_CMD_WAIT_FOR_SERVICES=1 \
+    VNC_PW=password \
+    KASM_USER=kasm_user \
+    KASM_PORT=6901
+
 # Install AyuGram Desktop
 # Note: We download the official Ayugram release for Linux
 RUN apt-get update && apt-get install -y wget tar xz-utils \
@@ -21,4 +28,11 @@ RUN chmod +x /usr/local/bin/start.sh
 COPY init.sh /etc/cont-init.d/99-ayugram-init
 RUN chmod +x /etc/cont-init.d/99-ayugram-init
 
-CMD ["bash", "/usr/local/bin/start.sh"]
+# Use the base image's entrypoint but ensure our scripts are ready
+# The base image uses a specific startup process, we'll hook into it
+COPY root /
+RUN chmod +x /etc/cont-init.d/99-ayugram
+
+# Keep the original CMD or entrypoint if needed, but usually HA handles this
+# For KasmVNC based images, we might need to stay close to their structure
+
