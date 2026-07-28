@@ -9,18 +9,16 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
 
 USER root
 
-# Install dependencies, download AyuGram, create target directory and link Telegram executable
 # Install dependencies, download Linux release of AyuGram, create target directory and link Telegram executable
 RUN apt-get update && apt-get install -y wget tar xz-utils curl jq \
-    && AYUGRAM_URL=$(curl -s https://api.github.com/repos/AyuGram/AyuGramDesktop/releases/latest | jq -r '.assets[].browser_download_url | select(test("tar\\.xz|linux|Linux"))' | grep -v "\.exe" | head -n 1) \
+    && AYUGRAM_URL=$(curl -s https://api.github.com/repos/rsg245/ayugram-desktop-bin-arch/releases/latest | jq -r '.assets[].browser_download_url | select(test("tar\\.xz|tar\\.gz"))' | head -n 1) \
     && echo "Downloading from: $AYUGRAM_URL" \
-    && mkdir -p /tmp/ayugram_extract /opt/AyuGram \
+    && mkdir -p /tmp/ayugram_extract /opt/AyuGram /opt/Telegram \
     && wget -O /tmp/ayugram_archive.tar.xz "$AYUGRAM_URL" \
     && tar -xf /tmp/ayugram_archive.tar.xz -C /tmp/ayugram_extract \
     && cp -r /tmp/ayugram_extract/*/* /opt/AyuGram/ 2>/dev/null || cp -r /tmp/ayugram_extract/* /opt/AyuGram/ \
     && rm -rf /tmp/ayugram_archive.tar.xz /tmp/ayugram_extract \
-    # Create substitution for Telegram and give full rights to everyone (777) so as not to be attached to the user
-    && mkdir -p /opt/Telegram \
+    # Створюємо підміну для Telegram Kasm і надаємо права
     && ln -sf /opt/AyuGram/AyuGram /opt/Telegram/Telegram \
     && chmod -R 777 /opt/AyuGram /opt/Telegram \
     && apt-get clean \
