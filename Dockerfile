@@ -9,6 +9,8 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
 
 # Install AyuGram Desktop
 # Note: We download the official Ayugram release for Linux
+USER root
+
 RUN apt-get update && apt-get install -y wget tar xz-utils \
     && wget -O /tmp/ayugram.tar.xz https://github.com/AyuGram/AyuGramDesktop/releases/latest/download/AyuGram-Setup.tar.xz \
     && tar -xf /tmp/ayugram.tar.xz -C /opt/ \
