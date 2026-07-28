@@ -1,6 +1,6 @@
 name: "AyuGram WebTop"
 description: "AyuGram Client for Home Assistant"
-version: "1.0.1"
+version: "1.0.2"
 slug: "ayugram_webtop"
 url: "https://github.com/jigurdas/ha-ayugram-addon"
 startup: system
@@ -21,5 +21,12 @@ apparmor: false
 ports:
   6901/tcp: 6901
 ports_description:
-  6901/tcp: "Web GUI (HTTPS)"
-schema: {}
+  6901/tcp: "Web GUI (HTTP/HTTPS)"
+
+options:
+  disable_https: true
+  custom_binary_path: "/opt/AyuGram/AyuGram"
+
+schema:
+  disable_https: bool
+  custom_binary_path: str
