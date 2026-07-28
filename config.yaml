@@ -1,13 +1,13 @@
-name: "AyuGram Webtop"
+name: "AyuGram WebTop"
+description: "AyuGram Client for Home Assistant"
 version: "1.0.0"
-slug: ayugram_webtop
-description: "Run AyuGram (Telegram Desktop) in a Docker container and access it via the browser from anywhere."
+slug: "ayugram_webtop"
 url: "https://github.com/jigurdas/ha-ayugram-addon"
-image: "jigurdas/ha-ayugram-addon-{arch}"
 startup: system
 arch:
+  - aarch64
   - amd64
-  - arm64
+  - armhf
   - armv7
   - i386
 init: false
