@@ -29,7 +29,8 @@ COPY init.sh /etc/cont-init.d/99-ayugram-init
 RUN chmod +x /etc/cont-init.d/99-ayugram-init
 
 COPY root /
-RUN chmod +x /etc/cont-init.d/99-ayugram
+RUN chmod +x /etc/cont-init.d/99-ayugram \
+    && chown -R kasm_user:kasm_user /opt/AyuGram || true
 
 CMD ["bash", "/usr/local/bin/start.sh"]
 
