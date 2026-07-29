@@ -36,10 +36,11 @@ jobs:
           pwd
           ls -la
           ls -la tdesktop || true
-            - name: Prepare AyuGram Desktop
-              run: |
-                cd tdesktop
-                ./Telegram/build/prepare/linux.sh
+          
+      - name: Prepare AyuGram Desktop
+        run: |
+          cd tdesktop
+          ./Telegram/build/prepare/linux.sh
           
       - name: Fix permissions
         run: |
