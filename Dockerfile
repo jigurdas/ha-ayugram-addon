@@ -8,7 +8,8 @@ USER root
 # HTTP WebSocket connection. Keep TLS at the Ingress boundary and allow HTTP
 # only between the Supervisor and this container.
 RUN sed -i 's/[[:space:]]-sslOnly//g' /dockerstartup/vnc_startup.sh \
-    && sed -i '/pem_key:/a\    require_ssl: false' /etc/kasmvnc/kasmvnc.yaml
+    && sed -i '/pem_key:/a\    require_ssl: false' /etc/kasmvnc/kasmvnc.yaml \
+    && sed -i 's/port: 8444/port: 6901/g' /etc/kasmvnc/kasmvnc.yaml
 
 ARG AYUGRAM_BINARY_PATH
 COPY ${AYUGRAM_BINARY_PATH} /opt/AyuGram/AyuGram

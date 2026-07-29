@@ -19,9 +19,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          pipx install poetry
+
       - name: Prepare AyuGram Desktop build environment
         run: |
           git clone --recursive https://github.com/AyuGram/AyuGramDesktop.git tdesktop
+          export PATH="$PATH:$HOME/.local/bin"
           ./tdesktop/Telegram/build/prepare/linux.sh
 
       - name: Build AyuGram Desktop

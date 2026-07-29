@@ -2,15 +2,18 @@
 FROM kasmweb/telegram:1.18.0
 
 USER root
-# Home Assistant Ingress terminates TLS before forwarding requests to the
-# add-on. KasmVNC's base startup script unconditionally adds `-sslOnly`, and
-# its default YAML configuration also requires SSL. Both reject the internal
-# HTTP WebSocket connection. Keep TLS at the Ingress boundary and allow HTTP
-# only between the Supervisor and this container.
+
+# Home Assistant Ingress configuration for KasmVNC
+# We need to disable SSL and set the correct websocket path/port
 RUN sed -i 's/[[:space:]]-sslOnly//g' /dockerstartup/vnc_startup.sh \
-    && sed -i '/pem_key:/a\    require_ssl: false' /etc/kasmvnc/kasmvnc.yaml
+    && sed -i '/pem_key:/a\    require_ssl: false' /etc/kasmvnc/kasmvnc.yaml \
+    && sed -i 's/port: 8444/port: 6901/g' /etc/kasmvnc/kasmvnc.yaml
+
+# Ensure KasmVNC allows connections from the Home Assistant proxy
+RUN echo "  websocket_path: /" >> /etc/kasmvnc/kasmvnc.yaml || true
 
 ARG AYUGRAM_BINARY_PATH
+# The binary path is relative to the context (root of repo)
 COPY ${AYUGRAM_BINARY_PATH} /opt/AyuGram/AyuGram
 RUN chmod +x /opt/AyuGram/AyuGram
 
@@ -18,6 +21,11 @@ RUN chmod +x /opt/AyuGram/AyuGram
 COPY ayugram/root /
 RUN chmod +x /dockerstartup/custom_startup.sh \
     && chmod +x /etc/cont-init.d/99-ayugram
+
+# Set environment variables for KasmVNC
+ENV VNC_PORT=6901 \
+    VNC_COL_DEPTH=24 \
+    VNC_RESOLUTION=1280x720
 
 LABEL \
     org.opencontainers.image.title="Home Assistant Add-on: AyuGram Webtop" \
