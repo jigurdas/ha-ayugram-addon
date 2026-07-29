@@ -26,6 +26,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-ayugram-source-
 
+      - name: Install Poetry
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install poetry
+      
+      - name: Prepare AyuGram Desktop
+        run: |
+          cd tdesktop
+          ./Telegram/build/prepare/linux.sh
+          
+      - name: Fix permissions
+        run: |
+          sudo chown -R $USER:$USER tdesktop
+          mkdir -p tdesktop/out
+          chmod -R 777 tdesktop/out
+
       - name: Clone AyuGram Desktop
         if: steps.cache-source.outputs.cache-hit != 'true'
         run: |
@@ -35,7 +51,9 @@ jobs:
         run: |
           # The centos_env image already contains all necessary build dependencies.
           # We only need to run the build script inside the container.
-          docker run --rm -v "$PWD/tdesktop:/usr/src/tdesktop" \
+          docker run --rm \
+                    -u $(id -u):$(id -g) \
+                    -v "$PWD/tdesktop:/usr/src/tdesktop" \
             ghcr.io/telegramdesktop/tdesktop/centos_env:latest \
             /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh \
             -D TDESKTOP_API_ID=${{ env.TDESKTOP_API_ID }} \
