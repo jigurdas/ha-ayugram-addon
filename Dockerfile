@@ -28,6 +28,12 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
 
 USER root
 
+# Install runtime dependencies for the built binary
+RUN apt-get update && apt-get install -y \
+    libxcb-keysyms1 libxcb-image0 libxcb-shm0 libxcb-icccm4 libxcb-sync1 libxcb-render-util0 libxcb-xfixes0 libxcb-randr0 libxcb-shape0 libxcb-xinerama0 libxkbcommon-x11-0 libxcb-xinput0 \
+    libfontconfig1 libdbus-1-3 libpulse0 libasound2 libnss3 libnspr4 \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Copy built binary from builder stage
 RUN mkdir -p /opt/AyuGram /opt/Telegram
 COPY --from=builder /usr/src/tdesktop/out/AyuGram /opt/AyuGram/AyuGram
@@ -36,9 +42,10 @@ COPY --from=builder /usr/src/tdesktop/out/AyuGram /opt/AyuGram/AyuGram
 RUN ln -sf /opt/AyuGram/AyuGram /opt/Telegram/Telegram \
     && chmod -R 777 /opt/AyuGram /opt/Telegram
 
-# Create a launcher script
+# Create a launcher script with display check
 RUN echo '#!/bin/bash' > /usr/local/bin/launch-ayugram.sh \
     && echo 'export DISPLAY=:1' >> /usr/local/bin/launch-ayugram.sh \
+    && echo 'for i in {1..30}; do if xset q > /dev/null 2>&1; then break; fi; sleep 1; done' >> /usr/local/bin/launch-ayugram.sh \
     && echo 'sudo -u kasm_user /opt/AyuGram/AyuGram &' >> /usr/local/bin/launch-ayugram.sh \
     && chmod +x /usr/local/bin/launch-ayugram.sh
 
