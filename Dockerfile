@@ -18,14 +18,10 @@ RUN apt-get update && apt-get install -y wget tar gzip \
     && rm -f /tmp/ayugram.tar.gz \
     && apt-get clean
     
-# Create a launcher script
-RUN echo '#!/bin/bash' > /usr/local/bin/launch-ayugram.sh \
-    && echo 'export DISPLAY=:1' >> /usr/local/bin/launch-ayugram.sh \
-    && echo 'sudo -u kasm_user /opt/AyuGram/AyuGram &' >> /usr/local/bin/launch-ayugram.sh \
-    && chmod +x /usr/local/bin/launch-ayugram.sh
-
 # Copy rootfs overlay
 COPY ayugram/root /
+RUN chmod +x /dockerstartup/custom_startup.sh \
+    && chmod +x /etc/cont-init.d/99-ayugram
 
 LABEL \
     org.opencontainers.image.title="Home Assistant Add-on: AyuGram Webtop" \

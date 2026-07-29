@@ -1,5 +1,5 @@
 name: "AyuGram Webtop"
-version: "1.1.5"
+version: "1.1.6"
 slug: "ayugram_webtop"
 description: "Run AyuGram (Telegram Desktop) in a Docker container and access it via the browser from anywhere."
 url: "https://github.com/jigurdas/ha-ayugram-addon/tree/main/ayugram"
@@ -10,6 +10,7 @@ arch:
 init: false
 ingress: true
 ingress_port: 6901
+ingress_stream: true
 panel_admin: true
 panel_icon: mdi:telegram
 panel_title: AyuGram

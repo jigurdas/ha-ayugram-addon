@@ -1,6 +1,6 @@
 name: "AyuGram WebTop"
 description: "AyuGram Client for Home Assistant"
-version: "1.1.5"
+version: "1.1.6"
 slug: "ayugram_webtop"
 url: "https://github.com/jigurdas/ha-ayugram-addon"
 image: "ghcr.io/jigurdas/ha-ayugram-addon-{arch}"
@@ -10,6 +10,7 @@ arch:
 init: false
 ingress: true
 ingress_port: 6901
+ingress_stream: true
 panel_admin: true
 panel_icon: "mdi:telegram"
 panel_title: "AyuGram"
