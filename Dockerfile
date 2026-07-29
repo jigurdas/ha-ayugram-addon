@@ -7,8 +7,8 @@ ARG TDESKTOP_API_HASH=b18441a1ff607e10a989891a5462e627
 
 WORKDIR /usr/src/tdesktop
 
-# Clone source code
-RUN git clone --recursive https://github.com/AyuGram/AyuGramDesktop.git .
+# Clone source code with shallow depth to save space
+RUN git clone --depth 1 --recursive https://github.com/AyuGram/AyuGramDesktop.git .
 
 # Prepare libraries with error handling
 RUN chmod +x Telegram/build/prepare/linux.sh \
