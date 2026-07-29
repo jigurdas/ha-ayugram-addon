@@ -1,3 +1,22 @@
+# --- Stage 1: Build AyuGram Desktop ---
+FROM ghcr.io/telegramdesktop/tdesktop/centos_env:latest AS builder
+
+# Set API credentials (using defaults from documentation)
+ARG TDESKTOP_API_ID=2040
+ARG TDESKTOP_API_HASH=b18441a1ff607e10a989891a5462e627
+
+WORKDIR /usr/src/tdesktop
+
+# Clone source code and prepare libraries
+RUN git clone --recursive https://github.com/AyuGram/AyuGramDesktop.git . \
+    && ./Telegram/build/prepare/linux.sh
+
+# Build the project
+RUN ./Telegram/build/docker/centos_env/build.sh \
+    -D TDESKTOP_API_ID=${TDESKTOP_API_ID} \
+    -D TDESKTOP_API_HASH=${TDESKTOP_API_HASH}
+
+# --- Stage 2: Final Addon Image ---
 FROM kasmweb/telegram:1.18.0
 
 # Set environment variables for Home Assistant
@@ -9,20 +28,13 @@ ENV S6_BEHAVIOUR_IF_STAGE2_FAILS=2 \
 
 USER root
 
-# Install dependencies, download Linux release of AyuGram, create target directory and link Telegram executable
-RUN apt-get update && apt-get install -y wget tar xz-utils curl jq \
-    && AYUGRAM_URL=$(curl -s https://api.github.com/repos/rsg245/ayugram-desktop-bin-arch/releases/latest | jq -r '.assets[].browser_download_url | select(test("tar\\.xz|tar\\.gz"))' | head -n 1) \
-    && echo "Downloading from: $AYUGRAM_URL" \
-    && mkdir -p /tmp/ayugram_extract /opt/AyuGram /opt/Telegram \
-    && wget -O /tmp/ayugram_archive.tar.xz "$AYUGRAM_URL" \
-    && tar -xf /tmp/ayugram_archive.tar.xz -C /tmp/ayugram_extract \
-    && cp -r /tmp/ayugram_extract/*/* /opt/AyuGram/ 2>/dev/null || cp -r /tmp/ayugram_extract/* /opt/AyuGram/ \
-    && rm -rf /tmp/ayugram_archive.tar.xz /tmp/ayugram_extract \
-    # Створюємо підміну для Telegram Kasm і надаємо права
-    && ln -sf /opt/AyuGram/AyuGram /opt/Telegram/Telegram \
-    && chmod -R 777 /opt/AyuGram /opt/Telegram \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+# Copy built binary from builder stage
+RUN mkdir -p /opt/AyuGram /opt/Telegram
+COPY --from=builder /usr/src/tdesktop/out/AyuGram /opt/AyuGram/AyuGram
+
+# Link Telegram executable and set permissions
+RUN ln -sf /opt/AyuGram/AyuGram /opt/Telegram/Telegram \
+    && chmod -R 777 /opt/AyuGram /opt/Telegram
 
 # Create a launcher script
 RUN echo '#!/bin/bash' > /usr/local/bin/launch-ayugram.sh \
