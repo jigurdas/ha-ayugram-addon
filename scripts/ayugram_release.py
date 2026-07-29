@@ -13,8 +13,8 @@ from datetime import datetime
 
 BUILD_FILE_PATTERNS = [
     '.github/workflows/build-ayugram.yml',
-    'scripts/',
     'patches/',
+    'scripts/ayugram_release.py',
 ]
 
 UPSTREAM_OWNER = os.environ.get('UPSTREAM_OWNER', 'AyuGram')

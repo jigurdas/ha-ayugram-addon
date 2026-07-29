@@ -19,8 +19,8 @@ UPSTREAM_REPO = os.environ.get('UPSTREAM_REPO', 'AyuGramDesktop')
 API_BASE = 'https://api.github.com'
 BUILD_FILE_PATTERNS = [
     '.github/workflows/build-ayugram.yml',
-    'scripts/',
     'patches/',
+    'scripts/ayugram_release.py',
 ]
 
 
