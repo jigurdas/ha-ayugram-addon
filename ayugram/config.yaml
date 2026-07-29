@@ -20,6 +20,9 @@ ports:
   "6901/tcp": 6901
 ports_description:
   "6901/tcp": "Web GUI (HTTPS)"
+network:
+  ssl:
+    require_ssl: false
 map: []
 schema: {}
 image: "ghcr.io/jigurdas/ha-ayugram-addon-{arch}"
