@@ -1,0 +1,102 @@
+
+name: Build AyuGram Addon
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  TDESKTOP_API_ID: 2040
+  TDESKTOP_API_HASH: b18441a1ff607e10a989891a5462e627
+
+jobs:
+  build-ayugram:
+    runs-on: ubuntu-latest
+    outputs:
+      ayugram_binary_path: ${{ steps.find-binary.outputs.path }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Prepare AyuGram Desktop build environment
+        run: |
+          git clone --recursive https://github.com/AyuGram/AyuGramDesktop.git tdesktop
+          ./tdesktop/Telegram/build/prepare/linux.sh
+
+      - name: Build AyuGram Desktop
+        run: |
+          docker run --rm -v "$PWD/tdesktop:/usr/src/tdesktop" \
+            ghcr.io/telegramdesktop/tdesktop/centos_env:latest \
+            /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh \
+            -D TDESKTOP_API_ID=${{ env.TDESKTOP_API_ID }} \
+            -D TDESKTOP_API_HASH=${{ env.TDESKTOP_API_HASH }}
+
+      - name: Find AyuGram binary
+        id: find-binary
+        run: |
+          AYUGRAM_BINARY=$(find tdesktop/out -name "AyuGram" -type f -print -quit)
+          if [ -z "$AYUGRAM_BINARY" ]; then
+            echo "Error: AyuGram binary not found in tdesktop/out/"
+            exit 1
+          fi
+          echo "path=$AYUGRAM_BINARY" >> "$GITHUB_OUTPUT"
+
+      - name: Upload AyuGram binary as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ayugram-binary
+          path: ${{ steps.find-binary.outputs.path }}
+          retention-days: 1
+
+  build-addon:
+    needs: build-ayugram
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    strategy:
+      matrix:
+        arch: [amd64]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download AyuGram binary artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ayugram-binary
+          path: ./build
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Read addon version
+        id: version
+        run: |
+          VERSION=$(grep '^version:' ayugram/config.yaml | cut -d'"' -f2)
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./ayugram/Dockerfile
+          push: true
+          platforms: linux/${{ matrix.arch }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            AYUGRAM_BINARY_PATH=build/AyuGram
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/ha-ayugram-addon-${{ matrix.arch }}:latest
+            ghcr.io/${{ github.repository_owner }}/ha-ayugram-addon-${{ matrix.arch }}:${{ steps.version.outputs.version }}

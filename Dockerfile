@@ -1,3 +1,4 @@
+
 FROM kasmweb/telegram:1.18.0
 
 USER root
@@ -9,15 +10,10 @@ USER root
 RUN sed -i 's/[[:space:]]-sslOnly//g' /dockerstartup/vnc_startup.sh \
     && sed -i '/pem_key:/a\    require_ssl: false' /etc/kasmvnc/kasmvnc.yaml
 
-# Install AyuGram Desktop pre-built binary
-# This avoids compiling from source, which fails in GitHub Actions due to memory limits and Docker-in-Docker issues.
-RUN apt-get update && apt-get install -y wget tar gzip \
-    && wget -O /tmp/ayugram.tar.gz \
-       https://github.com/AyuGram/AyuGramDesktop/releases/latest/download/AyuGramDesktop-6.7.8-full.tar.gz \
-    && tar -xzf /tmp/ayugram.tar.gz -C /opt/ \
-    && rm -f /tmp/ayugram.tar.gz \
-    && apt-get clean
-    
+ARG AYUGRAM_BINARY_PATH
+COPY ${AYUGRAM_BINARY_PATH} /opt/AyuGram/AyuGram
+RUN chmod +x /opt/AyuGram/AyuGram
+
 # Copy rootfs overlay
 COPY ayugram/root /
 RUN chmod +x /dockerstartup/custom_startup.sh \
