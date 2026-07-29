@@ -98,6 +98,19 @@ def compute_build_inputs_hash():
     return hasher.hexdigest()
 
 
+def get_upstream_latest_release():
+    return gh_api(f'/repos/{UPSTREAM_OWNER}/{UPSTREAM_REPO}/releases/latest')
+
+
+def get_repo_release_by_tag(tag_name):
+    try:
+        return gh_api(f'/repos/{REPO}/releases/tags/{urllib.parse.quote(tag_name, safe="")}')
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            return None
+        raise
+
+
 def get_active_build_run():
     response = gh_api(
         f"/repos/{REPO}/actions/workflows/{urllib.parse.quote(BUILD_WORKFLOW_FILE, safe='')}/runs?status=in_progress&per_page=10"

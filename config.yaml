@@ -1,6 +1,6 @@
 name: "AyuGram WebTop"
 description: "AyuGram Client for Home Assistant"
-version: "1.2.2"
+version: "1.3.0"
 slug: "ayugram_webtop"
 url: "https://github.com/jigurdas/ha-ayugram-addon"
 image: "ghcr.io/jigurdas/ha-ayugram-addon-{arch}"
