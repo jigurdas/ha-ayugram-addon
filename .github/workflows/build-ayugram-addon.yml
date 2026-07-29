@@ -30,18 +30,17 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           pip install poetry
-          
-          
-      - name: Fix permissions
-        run: |
-          sudo chown -R $USER:$USER tdesktop
-          mkdir -p tdesktop/out
-          chmod -R 777 tdesktop/out
 
       - name: Clone AyuGram Desktop
         if: steps.cache-source.outputs.cache-hit != 'true'
         run: |
           git clone --recursive https://github.com/AyuGram/AyuGramDesktop.git tdesktop
+
+      - name: Fix permissions
+        run: |
+          sudo chown -R $USER:$USER tdesktop
+          mkdir -p tdesktop/out
+          chmod -R 777 tdesktop/out
 
       - name: Debug files
         run: |
