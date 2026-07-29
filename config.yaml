@@ -6,11 +6,7 @@ url: "https://github.com/jigurdas/ha-ayugram-addon"
 image: "ghcr.io/jigurdas/ha-ayugram-addon-{arch}"
 startup: system
 arch:
-  - aarch64
   - amd64
-  - armhf
-  - armv7
-  - i386
 init: false
 ingress: true
 ingress_port: 6901

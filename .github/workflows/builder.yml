@@ -39,7 +39,7 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/ha-ayugram-addon-${{ matrix.arch }}:latest
-            ghcr.io/${{ github.repository_owner }}/ha-ayugram-addon-${{ matrix.arch }}:1.0.8
+            ghcr.io/${{ github.repository_owner }}/ha-ayugram-addon-${{ matrix.arch }}:1.1.0
           platforms: linux/${{ matrix.arch }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
