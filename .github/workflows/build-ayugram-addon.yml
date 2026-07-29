@@ -1,5 +1,5 @@
 
-name: Build AyuGram Addon (Optimized)
+name: Build AyuGram Addon
 
 on:
   push:
@@ -13,19 +13,11 @@ env:
 jobs:
   build-ayugram:
     runs-on: ubuntu-latest
-    outputs:
-      ayugram_binary_path: ${{ steps.find-binary.outputs.path }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-pip
-          pipx install poetry
-
-      - name: Cache AyuGram Desktop source and submodules
+      - name: Cache AyuGram Desktop source
         id: cache-source
         uses: actions/cache@v4
         with:
@@ -34,26 +26,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-ayugram-source-
 
-      - name: Prepare AyuGram Desktop build environment
+      - name: Clone AyuGram Desktop
         if: steps.cache-source.outputs.cache-hit != 'true'
         run: |
           git clone --recursive https://github.com/AyuGram/AyuGramDesktop.git tdesktop
-          export PATH="$PATH:$HOME/.local/bin"
-          ./tdesktop/Telegram/build/prepare/linux.sh
 
-      - name: Cache Build Objects
-        uses: actions/cache@v4
-        with:
-          path: |
-            tdesktop/out
-            tdesktop/Telegram/build/docker/centos_env/build
-          key: ${{ runner.os }}-ayugram-build-${{ github.sha }}
-          restore-keys: |
-            ${{ runner.os }}-ayugram-build-
-
-      - name: Build AyuGram Desktop
+      - name: Build AyuGram Desktop in Docker
         run: |
-          # We use -v to mount the cached tdesktop directory
+          # The centos_env image already contains all necessary build dependencies.
+          # We only need to run the build script inside the container.
           docker run --rm -v "$PWD/tdesktop:/usr/src/tdesktop" \
             ghcr.io/telegramdesktop/tdesktop/centos_env:latest \
             /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh \
