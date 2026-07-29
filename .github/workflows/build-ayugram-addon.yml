@@ -31,16 +31,6 @@ jobs:
           python3 -m pip install --upgrade pip
           pip install poetry
           
-      - name: Debug files
-        run: |
-          pwd
-          ls -la
-          ls -la tdesktop || true
-          
-      - name: Prepare AyuGram Desktop
-        run: |
-          cd tdesktop
-          ./Telegram/build/prepare/linux.sh
           
       - name: Fix permissions
         run: |
@@ -52,6 +42,17 @@ jobs:
         if: steps.cache-source.outputs.cache-hit != 'true'
         run: |
           git clone --recursive https://github.com/AyuGram/AyuGramDesktop.git tdesktop
+
+      - name: Debug files
+        run: |
+          pwd
+          ls -la
+          ls -la tdesktop || true
+          
+      - name: Prepare AyuGram Desktop
+        run: |
+          cd tdesktop
+          ./Telegram/build/prepare/linux.sh
 
       - name: Build AyuGram Desktop in Docker
         run: |
