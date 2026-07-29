@@ -1,0 +1,42 @@
+name: Build AyuGram
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 2 * * *'
+
+permissions:
+  contents: write
+
+env:
+  TDESKTOP_API_ID: 2040
+  TDESKTOP_API_HASH: b18441a1ff607e10a989891a5462e627
+  UPSTREAM_OWNER: AyuGram
+  UPSTREAM_REPO: AyuGramDesktop
+
+jobs:
+  build-ayugram:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Build or verify AyuGram release asset
+        run: |
+          python3 scripts/ayugram_release.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_SHA: ${{ github.sha }}
+          GITHUB_EVENT_BEFORE: ${{ github.event.before || '' }}
+          TDESKTOP_API_ID: ${{ env.TDESKTOP_API_ID }}
+          TDESKTOP_API_HASH: ${{ env.TDESKTOP_API_HASH }}

@@ -6,7 +6,6 @@ url: "https://github.com/jigurdas/ha-ayugram-addon/tree/main/ayugram"
 startup: application
 arch:
   - amd64
-  - aarch64
 init: false
 ingress: true
 ingress_port: 6901
@@ -27,4 +26,4 @@ network:
     require_ssl: false
 map: []
 schema: {}
-image: "ghcr.io/jigurdas/ha-ayugram-addon-{arch}"
+image: "ghcr.io/jigurdas/ha-ayugram-addon"

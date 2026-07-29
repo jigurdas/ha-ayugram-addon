@@ -3,14 +3,8 @@ FROM kasmweb/telegram:1.18.0
 
 USER root
 
-# Home Assistant Ingress configuration for KasmVNC
-# We need to disable SSL and set the correct websocket path/port
-RUN sed -i 's/[[:space:]]-sslOnly//g' /dockerstartup/vnc_startup.sh \
-    && sed -i '/pem_key:/a\    require_ssl: false' /etc/kasmvnc/kasmvnc.yaml \
-    && sed -i 's/port: 8444/port: 6901/g' /etc/kasmvnc/kasmvnc.yaml
-
-# Ensure KasmVNC allows connections from the Home Assistant proxy
-RUN echo "  websocket_path: /" >> /etc/kasmvnc/kasmvnc.yaml || true
+# KasmVNC configuration is provided via the overlay at ayugram/root/etc/kasmvnc/kasmvnc.yaml.
+# This avoids runtime YAML patching and ensures the configuration is valid and explicit.
 
 ARG AYUGRAM_BINARY_PATH
 # The binary path is relative to the context (root of repo)
