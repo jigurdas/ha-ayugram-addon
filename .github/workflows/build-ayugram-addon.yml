@@ -42,13 +42,6 @@ jobs:
           mkdir -p tdesktop/out
           chmod -R 777 tdesktop/out
 
-      - name: Debug files
-        run: |
-          pwd
-          ls -la
-          ls -la tdesktop || true
-        
-
       - name: Build AyuGram Desktop in Docker
         run: |
           # The centos_env image already contains all necessary build dependencies.
@@ -60,6 +53,11 @@ jobs:
             /usr/src/tdesktop/Telegram/build/docker/centos_env/build.sh \
             -D TDESKTOP_API_ID=${{ env.TDESKTOP_API_ID }} \
             -D TDESKTOP_API_HASH=${{ env.TDESKTOP_API_HASH }}
+
+      - name: Debug build output
+        run: |
+          echo "=== Contents of tdesktop/out ==="
+          find tdesktop/out -type f | sort
 
       - name: Find AyuGram binary
         id: find-binary
