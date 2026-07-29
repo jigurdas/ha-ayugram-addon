@@ -2,12 +2,13 @@ FROM kasmweb/telegram:1.18.0
 
 # Install AyuGram Desktop pre-built binary
 # This avoids compiling from source, which fails in GitHub Actions due to memory limits and Docker-in-Docker issues.
-RUN apt-get update && apt-get install -y wget tar xz-utils \
-    && wget -O /tmp/ayugram.tar.xz https://github.com/AyuGram/AyuGramDesktop/releases/latest/download/AyuGram-Setup.tar.xz \
-    && tar -xf /tmp/ayugram.tar.xz -C /opt/ \
-    && rm -f /tmp/ayugram.tar.xz \
+RUN apt-get update && apt-get install -y wget tar gzip \
+    && wget -O /tmp/ayugram.tar.gz \
+       https://github.com/AyuGram/AyuGramDesktop/releases/latest/download/AyuGramDesktop-6.7.8-full.tar.gz \
+    && tar -xzf /tmp/ayugram.tar.gz -C /opt/ \
+    && rm -f /tmp/ayugram.tar.gz \
     && apt-get clean
-
+    
 # Create a launcher script
 RUN echo '#!/bin/bash' > /usr/local/bin/launch-ayugram.sh \
     && echo 'export DISPLAY=:1' >> /usr/local/bin/launch-ayugram.sh \
