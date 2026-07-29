@@ -30,11 +30,16 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           pip install poetry
-      
-      - name: Prepare AyuGram Desktop
+          
+      - name: Debug files
         run: |
-          cd tdesktop
-          ./Telegram/build/prepare/linux.sh
+          pwd
+          ls -la
+          ls -la tdesktop || true
+            - name: Prepare AyuGram Desktop
+              run: |
+                cd tdesktop
+                ./Telegram/build/prepare/linux.sh
           
       - name: Fix permissions
         run: |
