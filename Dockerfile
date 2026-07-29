@@ -1,5 +1,7 @@
 FROM kasmweb/telegram:1.18.0
 
+
+USER root
 # Install AyuGram Desktop pre-built binary
 # This avoids compiling from source, which fails in GitHub Actions due to memory limits and Docker-in-Docker issues.
 RUN apt-get update && apt-get install -y wget tar gzip \
