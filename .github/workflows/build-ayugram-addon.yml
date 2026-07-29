@@ -47,11 +47,7 @@ jobs:
           pwd
           ls -la
           ls -la tdesktop || true
-          
-      - name: Prepare AyuGram Desktop
-        run: |
-          cd tdesktop
-          ./Telegram/build/prepare/linux.sh
+        
 
       - name: Build AyuGram Desktop in Docker
         run: |
