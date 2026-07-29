@@ -1,14 +1,21 @@
 # KasmVNC configuration for Home Assistant Ingress.
 # Home Assistant terminates TLS at the proxy. The internal KasmVNC
 # WebSocket connection must be allowed over plain HTTP and the VNC
-# port must match the HA ingress port.
+# (websocket) port must match the HA ingress port.
 
-vnc:
-  port: 6901
-  websocket_path: /
-
-ssl:
-  require_ssl: false
-
-pointer:
-  enabled: true
+# Official KasmVNC 1.4.0 configuration: use the `network` section.
+# See KasmVNC docs (configuration reference) for available keys.
+network:
+  protocol: http
+  interface: 0.0.0.0
+  # Keep the websocket port at 6901 to preserve previous behavior
+  # (previously `vnc.port: 6901`). You may change to `auto` if you
+  # prefer the server to select an available port.
+  websocket_port: 6901
+  use_ipv4: true
+  use_ipv6: true
+  ssl:
+    # Home Assistant terminates TLS at the proxy, so do not require SSL
+    # inside the container. This prevents certificate issues while HA
+    # handles TLS termination.
+    require_ssl: false
