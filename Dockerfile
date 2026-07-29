@@ -7,12 +7,16 @@ ARG TDESKTOP_API_HASH=b18441a1ff607e10a989891a5462e627
 
 WORKDIR /usr/src/tdesktop
 
-# Clone source code and prepare libraries
-RUN git clone --recursive https://github.com/AyuGram/AyuGramDesktop.git . \
-    && ./Telegram/build/prepare/linux.sh
+# Clone source code
+RUN git clone --recursive https://github.com/AyuGram/AyuGramDesktop.git .
+
+# Prepare libraries with error handling
+RUN chmod +x Telegram/build/prepare/linux.sh \
+    && ./Telegram/build/prepare/linux.sh || (cat /tmp/linux_prepare.log 2>/dev/null; exit 1)
 
 # Build the project
-RUN ./Telegram/build/docker/centos_env/build.sh \
+RUN chmod +x Telegram/build/docker/centos_env/build.sh \
+    && ./Telegram/build/docker/centos_env/build.sh \
     -D TDESKTOP_API_ID=${TDESKTOP_API_ID} \
     -D TDESKTOP_API_HASH=${TDESKTOP_API_HASH}
 
