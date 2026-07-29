@@ -16,7 +16,7 @@ RUN echo '#!/bin/bash' > /usr/local/bin/launch-ayugram.sh \
     && chmod +x /usr/local/bin/launch-ayugram.sh
 
 # Copy rootfs overlay
-COPY rootfs /
+COPY ayugram/root /
 
 LABEL \
     org.opencontainers.image.title="Home Assistant Add-on: AyuGram Webtop" \
