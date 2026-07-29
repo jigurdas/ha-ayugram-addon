@@ -1,5 +1,5 @@
 name: "AyuGram Webtop"
-version: "1.1.3"
+version: "1.1.4"
 slug: "ayugram_webtop"
 description: "Run AyuGram (Telegram Desktop) in a Docker container and access it via the browser from anywhere."
 url: "https://github.com/jigurdas/ha-ayugram-addon/tree/main/ayugram"
@@ -19,7 +19,7 @@ services: []
 ports:
   "6901/tcp": 6901
 ports_description:
-  "6901/tcp": "Web GUI (HTTPS)"
+  "6901/tcp": "Web GUI (HTTP; Home Assistant Ingress provides HTTPS)"
 
 network:
   ssl:

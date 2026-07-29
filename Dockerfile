@@ -1,6 +1,12 @@
 FROM kasmweb/telegram:1.18.0
 
 USER root
+# Home Assistant Ingress terminates TLS before forwarding requests to the
+# add-on. KasmVNC's base startup script unconditionally adds `-sslOnly`, which
+# rejects that internal HTTP WebSocket connection. Keep TLS at the Ingress
+# boundary and allow HTTP only between the Supervisor and this container.
+RUN sed -i 's/[[:space:]]-sslOnly//g' /dockerstartup/vnc_startup.sh
+
 # Install AyuGram Desktop pre-built binary
 # This avoids compiling from source, which fails in GitHub Actions due to memory limits and Docker-in-Docker issues.
 RUN apt-get update && apt-get install -y wget tar gzip \

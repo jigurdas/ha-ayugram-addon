@@ -5,6 +5,8 @@
 The addon comes with default settings that should work out of the box.
 
 - **webgui_port**: The port used to access the web interface (Default: 6901).
+  When opened from the Home Assistant sidebar, HTTPS is terminated by Home
+  Assistant Ingress; the connection from Ingress to the add-on uses HTTP.
 
 ## Troubleshooting
 
