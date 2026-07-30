@@ -1,6 +1,8 @@
 
 FROM kasmweb/telegram:1.18.0
 
+ENV VNCOPTIONS="${VNCOPTIONS} -DisableBasicAuth"
+
 USER root
 
 # KasmVNC configuration is provided via the overlay at ayugram/root/etc/kasmvnc/kasmvnc.yaml.
