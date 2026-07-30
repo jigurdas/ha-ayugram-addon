@@ -11,6 +11,9 @@ ARG AYUGRAM_BINARY_PATH
 COPY ${AYUGRAM_BINARY_PATH} /opt/AyuGram/AyuGram
 RUN chmod +x /opt/AyuGram/AyuGram
 
+# Remove the base image's forced KasmVNC SSL-only flag.
+RUN sed -i 's/ -sslOnly//g' /dockerstartup/vnc_startup.sh
+
 # Copy rootfs overlay
 COPY ayugram/root /
 RUN chmod +x /dockerstartup/custom_startup.sh \
