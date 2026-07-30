@@ -6,7 +6,7 @@ USER root
 # KasmVNC configuration is provided via the overlay at ayugram/root/etc/kasmvnc/kasmvnc.yaml.
 # This avoids runtime YAML patching and ensures the configuration is valid and explicit.
 
-ARG AYUGRAM_BINARY_PATH
+ARG AYUGRAM_BINARY_PATH=build/AyuGram
 # The binary path is relative to the context (root of repo)
 COPY ${AYUGRAM_BINARY_PATH} /opt/AyuGram/AyuGram
 RUN chmod +x /opt/AyuGram/AyuGram

@@ -1,21 +1,88 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+set -ex
 
-# vnc_startup.sh invokes this hook after the Xfce session has started. Match
-# Kasm's application startup sequence so the client does not start before the
-# desktop is ready, and restart it if the user closes it.
-export DISPLAY=:1
-export MAXIMIZE=true
-export XAUTHORITY=/home/kasm-user/.Xauthority
-export XDG_RUNTIME_DIR=${XDG_RUNTIME_DIR:-/run/user/1000}
+if [ "$(arch)" == "aarch64" ]; then
+  START_COMMAND="/usr/bin/telegram-desktop"
+  PGREP="telegram-desktop"
+else 
+  START_COMMAND="/opt/AyuGram/AyuGram"
+  PGREP="AyuGram"
+fi
+export MAXIMIZE="true"
+MAXIMIZE_SCRIPT=$STARTUPDIR/maximize_window.sh
+DEFAULT_ARGS="--no-sandbox"
+ARGS=${APP_ARGS:-$DEFAULT_ARGS}
 
-/usr/bin/filter_ready
-/usr/bin/desktop_ready
-bash "${STARTUPDIR}/maximize_window.sh" &
+options=$(getopt -o gau: -l go,assign,url: -n "$0" -- "$@") || exit
+eval set -- "$options"
 
-while true; do
-    if ! pgrep -x AyuGram > /dev/null; then
-        sudo -u kasm-user env HOME=/home/kasm-user DISPLAY="$DISPLAY" XAUTHORITY="$XAUTHORITY" XDG_RUNTIME_DIR="$XDG_RUNTIME_DIR" /opt/AyuGram/AyuGram --no-sandbox || true
-    fi
-    sleep 1
+while [[ $1 != -- ]]; do
+    case $1 in
+        -g|--go) GO='true'; shift 1;;
+        -a|--assign) ASSIGN='true'; shift 1;;
+        -u|--url) OPT_URL=$2; shift 2;;
+        *) echo "bad option: $1" >&2; exit 1;;
+    esac
 done
+shift
+
+# Process non-option arguments.
+for arg; do
+    echo "arg! $arg"
+done
+
+FORCE=$2
+
+kasm_exec() {
+    if [ -n "$OPT_URL" ] ; then
+        URL=$OPT_URL
+    elif [ -n "$1" ] ; then
+        URL=$1
+    fi 
+    
+    # Since we are execing into a container that already has the browser running from startup, 
+    #  when we don't have a URL to open we want to do nothing. Otherwise a second browser instance would open. 
+    if [ -n "$URL" ] ; then
+        /usr/bin/filter_ready
+        /usr/bin/desktop_ready
+        bash ${MAXIMIZE_SCRIPT} &
+        $START_COMMAND $ARGS $OPT_URL
+    else
+        echo "No URL specified for exec command. Doing nothing."
+    fi
+}
+
+kasm_startup() {
+    if [ -n "$KASM_URL" ] ; then
+        URL=$KASM_URL
+    elif [ -z "$URL" ] ; then
+        URL=$LAUNCH_URL
+    fi
+
+    if [ -z "$DISABLE_CUSTOM_STARTUP" ] ||  [ -n "$FORCE" ] ; then
+
+        echo "Entering process startup loop"
+        set +x
+        while true
+        do
+            if ! pgrep -x $PGREP > /dev/null
+            then
+                /usr/bin/filter_ready
+                /usr/bin/desktop_ready
+                set +e
+                bash ${MAXIMIZE_SCRIPT} &
+                $START_COMMAND $ARGS $URL
+                set -e
+            fi
+            sleep 1
+        done
+        set -x
+    
+    fi
+}
+
+if [ -n "$GO" ] || [ -n "$ASSIGN" ] ; then
+    kasm_exec
+else
+    kasm_startup
+fi
